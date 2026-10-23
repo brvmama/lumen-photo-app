@@ -313,8 +313,17 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             if (!res.ok) {
-                const err = await res.json();
-                throw new Error(err.detail || "Upload failed");
+                const text = await res.text();
+                let detail = "Upload failed";
+                try {
+                    const parsed = JSON.parse(text);
+                    detail = parsed.detail || detail;
+                } catch {
+                    if (res.status >= 500 || text.includes("<!DOCTYPE")) {
+                        detail = "Cannot reach server. Your PC appears to be asleep or offline.";
+                    }
+                }
+                throw new Error(detail);
             }
 
             const data = await res.json();
@@ -482,8 +491,17 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             if (!res.ok) {
-                const err = await res.json();
-                throw new Error(err.detail || "Enhancement failed");
+                const text = await res.text();
+                let detail = "Enhancement failed";
+                try {
+                    const parsed = JSON.parse(text);
+                    detail = parsed.detail || detail;
+                } catch {
+                    if (res.status >= 500 || text.includes("<!DOCTYPE")) {
+                        detail = "Cannot reach server. Your PC is sleeping or offline.";
+                    }
+                }
+                throw new Error(detail);
             }
 
             const data = await res.json();
