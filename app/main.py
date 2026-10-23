@@ -71,9 +71,9 @@ async def upload_photo(file: UploadFile = File(...)):
             if img.mode != "RGB":
                 img = img.convert("RGB")
             
-            # Scale photo from Pixel/iPhone to max 1600px (Full HD+)
-            # Keeps RAM under 150MB so Render Free Tier (512MB RAM) NEVER crashes
-            max_dim = 1600
+            # Scale photo from Pixel/iPhone to max 1200px (HD)
+            # Keeps RAM under 90MB so Render Free Tier (512MB RAM) NEVER crashes
+            max_dim = 1200
             if max(img.size) > max_dim:
                 scale = max_dim / max(img.size)
                 new_size = (int(img.width * scale), int(img.height * scale))
@@ -121,9 +121,17 @@ async def enhance_image(request: Request, payload: EnhanceRequest):
 
     try:
         with Image.open(orig_path) as img:
+            # Defensive guard: enforce max 1200px (HD) for Render 512MB Free Tier
+            if max(img.size) > 1200:
+                scale = 1200 / max(img.size)
+                new_size = (int(img.width * scale), int(img.height * scale))
+                img = img.resize(new_size, Image.Resampling.LANCZOS)
             intensity = payload.intensity if payload.intensity is not None else 0.85
             enhanced_img, report = enhance_photo(img, photographer, intensity=intensity)
             enhanced_img.save(enhanced_path, quality=92)
+            del img
+            import gc
+            gc.collect()
 
         # Construct URLs
         base = str(request.base_url).rstrip("/")
