@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LUMEN | Masterpiece Photo Enhancer</title>
+    <!-- Mobile PWA Meta Tags -->
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#d4af37">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="LUMEN">
+    <link rel="apple-touch-icon" href="/static/icon.png">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            900: '#090a0f',
+                            800: '#11131a',
+                            700: '#1b1e2a',
+                            600: '#262a3b'
+                        },
+                        amber: {
+                            gold: '#d4af37',
+                            warm: '#e6c280'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        serif: ['"Playfair Display"', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-dark-900 text-gray-100 min-h-screen font-sans flex flex-col selection:bg-amber-gold selection:text-black">
+
+    <!-- Top Navigation -->
+    <header class="border-b border-gray-800 bg-dark-900/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-gold to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
+                    <i class="fa-solid fa-camera-retro text-dark-900 text-xl font-bold"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                        LUMEN <span class="text-xs uppercase px-2 py-0.5 rounded-full bg-amber-gold/20 text-amber-gold border border-amber-gold/30">Master Edition</span>
+                    </h1>
+                    <p class="text-xs text-gray-400">Acclaimed Photographer Style Reference & Enhancement</p>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-3">
+                <button id="installPwaBtn" class="hidden flex items-center gap-2 text-xs font-bold text-dark-900 bg-amber-gold hover:bg-amber-400 px-3.5 py-2 rounded-lg shadow-lg shadow-amber-500/20 transition animate-pulse">
+                    <i class="fa-solid fa-mobile-screen-button text-sm"></i>
+                    <span>Install App</span>
+                </button>
+                <button id="openSettingsBtn" class="flex items-center gap-2 text-sm text-gray-300 hover:text-white px-3 py-2 rounded-lg bg-dark-800 border border-gray-700/60 hover:border-gray-600 transition">
+                    <i class="fa-brands fa-whatsapp text-green-400"></i>
+                    <span>Settings</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+
+        <!-- Intro Hero -->
+        <div class="text-center max-w-3xl mx-auto mb-10">
+            <h2 class="text-3xl sm:text-4xl font-extrabold font-serif tracking-tight text-white mb-3">
+                Refine Your Photos Through <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-gold via-amber-200 to-amber-500">Legendary Masters</span>
+            </h2>
+            <p class="text-gray-400 text-base">
+                Upload your photograph. Select or auto-detect its context (Landscape, Portrait, Architecture, Street) and apply the balanced filmic grading, tone curves, and dynamic range of history's most acclaimed photographers.
+            </p>
+        </div>
+
+        <!-- App Container Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+            <!-- Left Column: Upload, Context & Configuration -->
+            <div class="lg:col-span-5 space-y-6">
+
+                <!-- Upload Card -->
+                <div class="bg-dark-800 rounded-2xl border border-gray-800 p-6 shadow-xl relative overflow-hidden">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-base text-white flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-amber-gold/20 text-amber-gold text-xs flex items-center justify-center font-bold">1</span>
+                            Upload Photo
+                        </h3>
+                        <span class="text-xs text-gray-500">JPG, PNG, WEBP</span>
+                    </div>
+
+                    <!-- Dropzone -->
+                    <label for="photoInput" id="dropZone" class="block border-2 border-dashed border-gray-700 hover:border-amber-gold/60 rounded-xl p-6 text-center cursor-pointer transition group bg-dark-900/40 relative select-none">
+                        <input type="file" id="photoInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                        
+                        <div id="uploadPrompt" class="space-y-3 pointer-events-none">
+                            <div class="w-14 h-14 mx-auto rounded-full bg-dark-700 flex items-center justify-center group-hover:scale-110 transition duration-300">
+                                <i class="fa-solid fa-cloud-arrow-up text-xl text-amber-gold"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-gray-200 group-hover:text-amber-gold transition">
+                                    Tap to Choose Photo
+                                </p>
+                                <p class="text-xs text-gray-500 mt-0.5">Click or drag image here</p>
+                            </div>
+                            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-gold/20 text-amber-gold border border-amber-gold/40 text-xs font-bold shadow-sm">
+                                <i class="fa-solid fa-images"></i>
+                                <span>Open Google Photos / Camera</span>
+                            </div>
+                        </div>
+
+                        <!-- Image Preview in Dropzone -->
+                        <div id="previewContainer" class="hidden relative z-20">
+                            <img id="imagePreview" src="" alt="Uploaded preview" class="w-full max-h-60 object-contain rounded-lg border border-gray-700">
+                            <button type="button" id="removeImageBtn" class="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/75 hover:bg-red-600 text-white flex items-center justify-center transition shadow-lg z-30 pointer-events-auto">
+                                <i class="fa-solid fa-xmark text-sm"></i>
+                            </button>
+                        </div>
+                    </label>
+
+                    <!-- Quick Sample Buttons -->
+                    <div class="mt-4 pt-3 border-t border-gray-800/80">
+                        <p class="text-xs text-gray-400 mb-2 font-medium">Or test with instant demo photos:</p>
+                        <div class="grid grid-cols-4 gap-2">
+                            <button type="button" class="sample-btn text-xs py-1.5 px-2 rounded-lg bg-dark-700 hover:bg-dark-600 text-gray-300 transition text-center" data-type="landscape">
+                                🏞️ Landscape
+                            </button>
+                            <button type="button" class="sample-btn text-xs py-1.5 px-2 rounded-lg bg-dark-700 hover:bg-dark-600 text-gray-300 transition text-center" data-type="portrait">
+                                👤 Portrait
+                            </button>
+                            <button type="button" class="sample-btn text-xs py-1.5 px-2 rounded-lg bg-dark-700 hover:bg-dark-600 text-gray-300 transition text-center" data-type="architecture">
+                                🏛️ Architecture
+                            </button>
+                            <button type="button" class="sample-btn text-xs py-1.5 px-2 rounded-lg bg-dark-700 hover:bg-dark-600 text-gray-300 transition text-center" data-type="street">
+                                🚶 Street
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Context & Photographer Recommendation Card -->
+                <div id="contextCard" class="bg-dark-800 rounded-2xl border border-gray-800 p-6 shadow-xl space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-bold text-base text-white flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-amber-gold/20 text-amber-gold text-xs flex items-center justify-center font-bold">2</span>
+                            Select Scene Context
+                        </h3>
+                        <span id="autoDetectPill" class="text-[11px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                            Auto-Detect Active
+                        </span>
+                    </div>
+
+                    <!-- Interactive Category Selector Buttons -->
+                    <div class="grid grid-cols-3 gap-2" id="categoryButtonGroup">
+                        <button type="button" data-cat="Landscape" class="cat-pill active flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl text-xs font-semibold border transition border-amber-gold bg-amber-gold/20 text-amber-gold">
+                            <span>🏞️</span> Landscape
+                        </button>
+                        <button type="button" data-cat="Portrait" class="cat-pill flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl text-xs font-semibold border transition border-gray-700 bg-dark-900 text-gray-300 hover:border-gray-500">
+                            <span>👤</span> Portrait
+                        </button>
+                        <button type="button" data-cat="Architecture" class="cat-pill flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl text-xs font-semibold border transition border-gray-700 bg-dark-900 text-gray-300 hover:border-gray-500">
+                            <span>🏛️</span> Architecture
+                        </button>
+                        <button type="button" data-cat="Street" class="cat-pill flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl text-xs font-semibold border transition border-gray-700 bg-dark-900 text-gray-300 hover:border-gray-500">
+                            <span>🚶</span> Street
+                        </button>
+                        <button type="button" data-cat="Night" class="cat-pill flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl text-xs font-semibold border transition border-gray-700 bg-dark-900 text-gray-300 hover:border-gray-500">
+                            <span>🌙</span> Night
+                        </button>
+                        <button type="button" data-cat="Macro" class="cat-pill flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl text-xs font-semibold border transition border-gray-700 bg-dark-900 text-gray-300 hover:border-gray-500">
+                            <span>🔍</span> Macro
+                        </button>
+                    </div>
+
+                    <!-- AI Analysis Note -->
+                    <div id="aiAnalysisBox" class="bg-dark-900/60 rounded-xl p-3 border border-gray-800 text-xs text-gray-400 space-y-1">
+                        <div class="flex justify-between">
+                            <span>Visual Analysis:</span>
+                            <span id="detectedContextName" class="text-white font-medium">Ready</span>
+                        </div>
+                        <p id="reasoningText" class="text-[11px] text-gray-400 leading-snug"></p>
+                    </div>
+
+                    <!-- Master Photographer Dropdown -->
+                    <div class="space-y-2">
+                        <label class="text-xs font-semibold text-gray-300 uppercase tracking-wider block">
+                            Acclaimed Photographer Reference:
+                        </label>
+                        <select id="photographerSelect" class="w-full bg-dark-900 border border-gray-700 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-amber-gold transition">
+                            <!-- Populated via JS -->
+                        </select>
+                    </div>
+
+                    <!-- Master Profile Card -->
+                    <div id="photographerBioCard" class="bg-dark-700/40 rounded-xl p-4 border border-gray-700/60 space-y-2.5">
+                        <div class="flex items-center justify-between">
+                            <h4 id="masterName" class="font-bold text-white text-base">Peter Lik</h4>
+                            <span id="masterEra" class="text-xs text-gray-400">1959 – Present</span>
+                        </div>
+                        <p id="masterTitle" class="text-xs font-medium text-amber-gold"></p>
+                        <p id="masterPhilosophy" class="text-xs text-gray-300 leading-relaxed"></p>
+
+                        <!-- Acclaimed Works Pill List -->
+                        <div class="pt-2 border-t border-gray-700/50">
+                            <span class="text-[11px] uppercase tracking-wider text-gray-400 block mb-1 font-semibold">Acclaimed Reference Works:</span>
+                            <ul id="acclaimedWorksList" class="text-xs text-amber-200/90 list-disc list-inside space-y-0.5">
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Enhancement Intensity Slider -->
+                    <div class="bg-dark-900/50 p-3.5 rounded-xl border border-gray-800 space-y-2">
+                        <div class="flex justify-between items-center text-xs">
+                            <label class="font-semibold text-gray-300">Grading Strength:</label>
+                            <span id="intensityLabel" class="text-amber-gold font-bold">85% (Balanced)</span>
+                        </div>
+                        <input type="range" id="intensitySlider" min="30" max="100" value="85" step="5" class="w-full accent-amber-gold cursor-pointer">
+                        <div class="flex justify-between text-[10px] text-gray-500">
+                            <span>Subtle (30%)</span>
+                            <span>Natural (65%)</span>
+                            <span>Balanced (85%)</span>
+                            <span>Full Master (100%)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phone Notification Card (WhatsApp or SMS) -->
+                <div class="bg-dark-800 rounded-2xl border border-gray-800 p-6 shadow-xl space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-bold text-base text-white flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-amber-gold/20 text-amber-gold text-xs flex items-center justify-center font-bold">3</span>
+                            Phone Notification
+                        </h3>
+                        <span class="text-xs text-emerald-400 flex items-center gap-1">
+                            <i class="fa-solid fa-bolt"></i> Instant Alert
+                        </span>
+                    </div>
+                    
+                    <p class="text-xs text-gray-400 leading-relaxed">
+                        Receive a completion alert with the direct high-res download link sent right to your smartphone:
+                    </p>
+
+                    <!-- Channel Switcher -->
+                    <div class="grid grid-cols-2 gap-3 p-1 bg-dark-900 rounded-xl border border-gray-800">
+                        <label class="flex items-center justify-center gap-2 py-2 px-3 rounded-lg cursor-pointer text-sm font-medium transition text-gray-300 has-[:checked]:bg-emerald-600/20 has-[:checked]:text-emerald-300 has-[:checked]:border has-[:checked]:border-emerald-500/40">
+                            <input type="radio" name="notifyChannel" value="whatsapp" checked class="hidden">
+                            <i class="fa-brands fa-whatsapp text-lg text-green-400"></i>
+                            <span>WhatsApp</span>
+                        </label>
+
+                        <label class="flex items-center justify-center gap-2 py-2 px-3 rounded-lg cursor-pointer text-sm font-medium transition text-gray-300 has-[:checked]:bg-sky-600/20 has-[:checked]:text-sky-300 has-[:checked]:border has-[:checked]:border-sky-500/40">
+                            <input type="radio" name="notifyChannel" value="sms" class="hidden">
+                            <i class="fa-solid fa-comment-sms text-lg text-sky-400"></i>
+                            <span>SMS</span>
+                        </label>
+                    </div>
+
+                    <!-- Phone Number Input -->
+                    <div>
+                        <label class="block text-xs font-medium text-gray-400 mb-1.5">Your Mobile Phone Number (with Country Code):</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-500 text-sm">
+                                <i class="fa-solid fa-phone"></i>
+                            </span>
+                            <input type="tel" id="userPhoneNumber" placeholder="+1 (555) 019-2834" class="w-full bg-dark-900 border border-gray-700 rounded-xl pl-10 pr-4 py-2 text-sm text-white focus:outline-none focus:border-amber-gold placeholder-gray-600 transition">
+                        </div>
+                    </div>
+
+                    <!-- Enhance Action Button -->
+                    <button id="enhanceBtn" disabled class="w-full py-3.5 px-6 rounded-xl font-bold text-sm tracking-wide uppercase transition duration-300 flex items-center justify-center gap-2 bg-gradient-to-r from-amber-gold to-amber-600 hover:from-amber-500 hover:to-amber-600 text-dark-900 shadow-lg shadow-amber-500/25 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        <span id="enhanceBtnText">Enhance in Master Style</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Column: Interactive Results Studio -->
+            <div class="lg:col-span-7 space-y-6">
+
+                <!-- Placeholder / Empty State -->
+                <div id="emptyState" class="bg-dark-800/60 rounded-2xl border border-gray-800 p-12 text-center min-h-[500px] flex flex-col items-center justify-center">
+                    <div class="w-20 h-20 rounded-2xl bg-dark-700/50 flex items-center justify-center mb-5 text-gray-600">
+                        <i class="fa-regular fa-image text-4xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">Interactive Comparison Studio</h3>
+                    <p class="text-sm text-gray-400 max-w-md">
+                        Upload a photo to see the live split before/after comparison, master grading breakdown, and download your high-resolution enhanced masterpiece.
+                    </p>
+                </div>
+
+                <!-- Processing Spinner -->
+                <div id="processingState" class="hidden bg-dark-800 rounded-2xl border border-gray-800 p-12 text-center min-h-[500px] flex flex-col items-center justify-center space-y-5">
+                    <div class="relative w-20 h-20">
+                        <div class="w-20 h-20 rounded-full border-4 border-dark-600 border-t-amber-gold animate-spin"></div>
+                        <i class="fa-solid fa-palette text-amber-gold absolute inset-0 flex items-center justify-center text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-white mb-1">Applying Master Photographic Recipe</h3>
+                        <p id="processingStatusText" class="text-sm text-gray-400">Calibrating filmic tone curves, dynamic range & color vibrance...</p>
+                    </div>
+                </div>
+
+                <!-- Active Results Studio -->
+                <div id="resultsStudio" class="hidden space-y-6">
+
+                    <!-- Comparison Card -->
+                    <div class="bg-dark-800 rounded-2xl border border-gray-800 p-6 shadow-2xl overflow-hidden">
+                        
+                        <div class="flex flex-wrap items-center justify-between gap-4 mb-5">
+                            <div>
+                                <h3 class="font-bold text-xl text-white flex items-center gap-2">
+                                    <span>Masterpiece Studio</span>
+                                    <span id="resultsStyleTag" class="text-xs px-2.5 py-0.5 rounded-full bg-amber-gold/20 text-amber-gold border border-amber-gold/30">
+                                        Peter Lik Style
+                                    </span>
+                                </h3>
+                                <p class="text-xs text-gray-400 mt-1">Drag the center slider to inspect before & after grading</p>
+                            </div>
+
+                            <!-- Download with Custom Rename Option -->
+                            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full sm:w-auto">
+                                <div class="relative flex items-center flex-1 sm:w-64">
+                                    <span class="absolute left-3 text-amber-gold text-xs pointer-events-none">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </span>
+                                    <input type="text" id="customFileNameInput" value="Enhanced_Masterpiece" placeholder="Name your photo..." class="w-full bg-dark-900 border border-gray-700 focus:border-amber-gold rounded-xl pl-8 pr-12 py-2.5 text-xs text-white focus:outline-none transition shadow-inner font-medium">
+                                    <span class="absolute right-3 text-gray-500 text-xs font-mono pointer-events-none">.jpg</span>
+                                </div>
+                                <button type="button" id="downloadBtn" class="py-2.5 px-5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-semibold text-xs tracking-wide uppercase transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/30 whitespace-nowrap">
+                                    <i class="fa-solid fa-cloud-arrow-down text-sm"></i>
+                                    <span>Download</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Before / After Split Slider Container -->
+                        <div class="comparison-container rounded-xl overflow-hidden border border-gray-700 select-none shadow-inner bg-black" id="comparisonSlider">
+                            <!-- Enhanced Image (Full width background) -->
+                            <img id="enhancedImageDisplay" src="" alt="Enhanced" class="comparison-image enhanced">
+
+                            <!-- Original Image (Clipped overlay) -->
+                            <div class="comparison-clip" id="comparisonClip">
+                                <img id="originalImageDisplay" src="" alt="Original" class="comparison-image original">
+                            </div>
+
+                            <!-- Slider Divider Handle -->
+                            <div class="slider-handle" id="sliderHandle">
+                                <div class="slider-button">
+                                    <i class="fa-solid fa-arrows-left-right text-xs text-dark-900"></i>
+                                </div>
+                            </div>
+
+                            <!-- Labels -->
+                            <div class="absolute bottom-3 left-3 bg-black/60 backdrop-blur-sm text-gray-300 text-[11px] font-semibold uppercase px-2.5 py-1 rounded border border-white/10 pointer-events-none">
+                                Original
+                            </div>
+                            <div class="absolute bottom-3 right-3 bg-amber-gold/90 backdrop-blur-sm text-dark-900 text-[11px] font-bold uppercase px-2.5 py-1 rounded pointer-events-none">
+                                Enhanced
+                            </div>
+                        </div>
+
+                        <!-- Phone Notification Status Banner -->
+                        <div id="notificationBanner" class="mt-5 p-4 rounded-xl border border-gray-700 bg-dark-900 flex items-center justify-between gap-4">
+                            <div class="flex items-center gap-3">
+                                <div id="notifyStatusIcon" class="w-10 h-10 rounded-xl bg-green-500/20 text-green-400 flex items-center justify-center text-xl flex-shrink-0">
+                                    <i class="fa-brands fa-whatsapp"></i>
+                                </div>
+                                <div>
+                                    <h4 id="notifyStatusTitle" class="text-xs font-bold text-white">Notification Dispatched</h4>
+                                    <p id="notifyStatusDesc" class="text-xs text-gray-400">Download link sent to phone.</p>
+                                </div>
+                            </div>
+                            <a id="directActionLink" href="#" target="_blank" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-600 hover:text-white transition whitespace-nowrap">
+                                Open in WhatsApp <i class="fa-solid fa-arrow-up-right-from-square ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Photographic Metrics & Style Recipe Breakdown -->
+                    <div class="bg-dark-800 rounded-2xl border border-gray-800 p-6 shadow-xl space-y-4">
+                        <h4 class="font-bold text-sm text-white uppercase tracking-wider flex items-center gap-2">
+                            <i class="fa-solid fa-sliders text-amber-gold"></i>
+                            Photographic Adjustments Applied
+                        </h4>
+
+                        <div id="recipeMetricsGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+
+                        <div class="bg-dark-900/50 p-3.5 rounded-xl border border-gray-800 text-xs text-gray-300">
+                            <span class="font-semibold text-amber-gold">Artistic Signature:</span>
+                            <span id="appliedSignatureText" class="ml-1 text-gray-300"></span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Settings Modal (Twilio & WhatsApp configuration) -->
+    <div id="settingsModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-dark-800 border border-gray-700 rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-2xl relative">
+            <div class="flex items-center justify-between border-b border-gray-700 pb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-green-500/20 text-green-400 flex items-center justify-center">
+                        <i class="fa-brands fa-whatsapp text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-white">Phone & Twilio Settings</h3>
+                        <p class="text-xs text-gray-400">Configure automated WhatsApp & SMS delivery</p>
+                    </div>
+                </div>
+                <button id="closeSettingsBtn" class="text-gray-400 hover:text-white text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <p class="text-xs text-gray-300 leading-relaxed">
+                By default, you can click <strong>"Open in WhatsApp"</strong> to send messages instantly to your phone without configuring anything! For automated background SMS/WhatsApp delivery via Twilio API, enter your credentials below:
+            </p>
+
+            <form id="settingsForm" class="space-y-3.5">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1">Twilio Account SID</label>
+                    <input type="text" id="settingAccountSid" placeholder="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" class="w-full bg-dark-900 border border-gray-700 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-amber-gold font-mono">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1">Twilio Auth Token</label>
+                    <input type="password" id="settingAuthToken" placeholder="••••••••••••••••••••••••••••••••" class="w-full bg-dark-900 border border-gray-700 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-amber-gold font-mono">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1">Twilio SMS Phone Number</label>
+                    <input type="text" id="settingSmsNumber" placeholder="+1234567890" class="w-full bg-dark-900 border border-gray-700 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-amber-gold">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1">Twilio WhatsApp Number</label>
+                    <input type="text" id="settingWhatsAppNumber" placeholder="whatsapp:+14155238886" class="w-full bg-dark-900 border border-gray-700 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-amber-gold">
+                </div>
+
+                <div class="flex justify-end gap-3 pt-3 border-t border-gray-700">
+                    <button type="button" id="cancelSettingsBtn" class="px-4 py-2 rounded-lg text-xs font-semibold text-gray-400 hover:text-white transition">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-5 py-2 rounded-lg bg-amber-gold hover:bg-amber-500 text-dark-900 text-xs font-bold transition">
+                        Save Settings
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Mobile PWA Floating Install Banner -->
+    <div id="mobileInstallBanner" class="fixed bottom-4 inset-x-4 max-w-md mx-auto bg-dark-800 border border-amber-gold/40 rounded-2xl p-4 shadow-2xl z-40 hidden flex items-center justify-between gap-3 backdrop-blur-md">
+        <div class="flex items-center gap-3">
+            <img src="/static/icon.png" alt="LUMEN App" class="w-12 h-12 rounded-xl border border-amber-gold/50 shadow">
+            <div>
+                <h4 class="text-xs font-bold text-white">Install LUMEN App</h4>
+                <p class="text-[11px] text-gray-400">Add to home screen for camera access & full-screen view</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <button id="bannerInstallBtn" class="px-3.5 py-2 rounded-xl bg-amber-gold hover:bg-amber-400 text-dark-900 text-xs font-bold shadow-md transition whitespace-nowrap">
+                Install
+            </button>
+            <button id="closeBannerBtn" class="w-8 h-8 rounded-xl bg-dark-700 text-gray-400 hover:text-white flex items-center justify-center transition">
+                <i class="fa-solid fa-xmark text-xs"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- iOS Install Instructions Modal -->
+    <div id="iosInstallModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center hidden p-4">
+        <div class="bg-dark-800 border border-amber-gold/40 rounded-2xl max-w-sm w-full p-5 space-y-4 shadow-2xl text-center">
+            <img src="/static/icon.png" alt="LUMEN App" class="w-14 h-14 rounded-2xl border border-amber-gold/50 mx-auto shadow-lg shadow-amber-500/20">
+            <div>
+                <h3 class="text-base font-bold text-white">Install LUMEN on iPhone</h3>
+                <p class="text-xs text-gray-400 mt-1">To add LUMEN to your home screen:</p>
+            </div>
+
+            <div class="bg-dark-900/80 p-3.5 rounded-xl border border-gray-700 text-left text-xs space-y-2.5 text-gray-300">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-6 h-6 rounded-full bg-amber-gold/20 text-amber-gold font-bold flex items-center justify-center flex-shrink-0">1</span>
+                    <span>Tap the <strong>Share</strong> button <i class="fa-solid fa-arrow-up-from-bracket text-amber-gold mx-1"></i> in Safari's bottom bar.</span>
+                </div>
+                <div class="flex items-center gap-2.5">
+                    <span class="w-6 h-6 rounded-full bg-amber-gold/20 text-amber-gold font-bold flex items-center justify-center flex-shrink-0">2</span>
+                    <span>Scroll down and select <strong>"Add to Home Screen"</strong> <i class="fa-regular fa-square-plus text-amber-gold mx-1"></i>.</span>
+                </div>
+                <div class="flex items-center gap-2.5">
+                    <span class="w-6 h-6 rounded-full bg-amber-gold/20 text-amber-gold font-bold flex items-center justify-center flex-shrink-0">3</span>
+                    <span>Tap <strong>Add</strong> in the top right corner.</span>
+                </div>
+            </div>
+
+            <button id="closeIosModalBtn" class="w-full py-2.5 rounded-xl bg-amber-gold text-dark-900 font-bold text-xs">
+                Got It
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-800 py-6 text-center text-xs text-gray-500">
+        <p>LUMEN Photo Enhancer &copy; 2026. Preserving natural highlights & authentic master photography styles.</p>
+    </footer>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

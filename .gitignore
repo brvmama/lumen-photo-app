@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+.venv/
+env/
+venv/
+cloudflared.exe
+app/static/uploads/original_*
+app/static/uploads/enhanced_*
+.DS_Store
+Thumbs.db
