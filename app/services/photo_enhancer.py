@@ -46,6 +46,10 @@ def enhance_photo(
 
     # Convert to RGB float32 [0.0, 1.0]
     orig_img = image.convert("RGB")
+    max_dim = 2400
+    if max(orig_img.size) > max_dim:
+        scale = max_dim / max(orig_img.size)
+        orig_img = orig_img.resize((int(orig_img.width * scale), int(orig_img.height * scale)), Image.Resampling.LANCZOS)
     arr = np.array(orig_img, dtype=np.float32) / 255.0
 
     # 1. Shadow Recovery (Gentle power curve on shadows, preserving highlights)
@@ -145,16 +149,10 @@ def enhance_photo(
     # Convert to PIL Image
     enhanced_pil = Image.fromarray((arr * 255.0).astype(np.uint8))
 
-    # 7. Micro-Clarity (Edge-preserving local contrast)
+    # 7. Micro-Clarity (High-pass local contrast using memory-safe native C filter)
     if clarity > 1.0:
-        blurred = enhanced_pil.filter(ImageFilter.GaussianBlur(radius=6))
-        orig_np = np.array(enhanced_pil, dtype=np.float32)
-        blur_np = np.array(blurred, dtype=np.float32)
-        diff = orig_np - blur_np
-        # Soft clarity boost avoiding halos
-        clarity_np = orig_np + diff * (clarity - 1.0) * 0.28
-        clarity_np = np.clip(clarity_np, 0, 255).astype(np.uint8)
-        enhanced_pil = Image.fromarray(clarity_np)
+        percent = int((clarity - 1.0) * 110)
+        enhanced_pil = enhanced_pil.filter(ImageFilter.UnsharpMask(radius=4, percent=percent, threshold=2))
 
     # 8. Razor Sharpness
     if sharpness > 1.0:

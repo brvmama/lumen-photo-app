@@ -64,13 +64,24 @@ async def upload_photo(file: UploadFile = File(...)):
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         
-        # Open and validate image
-        with Image.open(file_path) as img:
-            img.verify()
-        
-        with Image.open(file_path) as img:
+        # Open and process image: handle phone orientation (EXIF) and scale down if huge
+        with Image.open(file_path) as raw_img:
+            from PIL import ImageOps
+            img = ImageOps.exif_transpose(raw_img) or raw_img
+            if img.mode != "RGB":
+                img = img.convert("RGB")
+            
+            # If photo from Pixel/iPhone is huge (e.g. 12MP to 50MP), scale to max 2400px (2K HD)
+            # This prevents 512MB RAM crash on Render Free Tier while keeping print-grade sharpness
+            max_dim = 2400
+            if max(img.size) > max_dim:
+                scale = max_dim / max(img.size)
+                new_size = (int(img.width * scale), int(img.height * scale))
+                img = img.resize(new_size, Image.Resampling.LANCZOS)
+            
+            # Save optimized original image
+            img.save(file_path, quality=94, optimize=True)
             width, height = img.size
-            # Classify context
             context_analysis = analyze_photo_context(img)
 
         # Match default acclaimed photographer for this category
