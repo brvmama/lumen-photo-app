@@ -13,10 +13,11 @@ def filmic_s_curve(x: np.ndarray, contrast: float) -> np.ndarray:
     Smooth Hermite S-curve that anchors 0.0 and 1.0, gently rolling off highlights
     and deepening blacks without clipping or blowing out clouds/skies.
     """
-    # Smoothstep function: 3*x^2 - 2*x^3
-    smooth = 3.0 * (x ** 2) - 2.0 * (x ** 3)
+    if contrast == 1.0:
+        return x
     k = max(0.0, contrast - 1.0)
-    # Blend linear with smoothstep
+    # Memory-efficient smoothstep
+    smooth = (x * x) * (3.0 - 2.0 * x)
     return x * (1.0 - k) + smooth * k
 
 def enhance_photo(
@@ -46,7 +47,7 @@ def enhance_photo(
 
     # Convert to RGB float32 [0.0, 1.0]
     orig_img = image.convert("RGB")
-    max_dim = 2400
+    max_dim = 1600
     if max(orig_img.size) > max_dim:
         scale = max_dim / max(orig_img.size)
         orig_img = orig_img.resize((int(orig_img.width * scale), int(orig_img.height * scale)), Image.Resampling.LANCZOS)

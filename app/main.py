@@ -71,16 +71,16 @@ async def upload_photo(file: UploadFile = File(...)):
             if img.mode != "RGB":
                 img = img.convert("RGB")
             
-            # If photo from Pixel/iPhone is huge (e.g. 12MP to 50MP), scale to max 2400px (2K HD)
-            # This prevents 512MB RAM crash on Render Free Tier while keeping print-grade sharpness
-            max_dim = 2400
+            # Scale photo from Pixel/iPhone to max 1600px (Full HD+)
+            # Keeps RAM under 150MB so Render Free Tier (512MB RAM) NEVER crashes
+            max_dim = 1600
             if max(img.size) > max_dim:
                 scale = max_dim / max(img.size)
                 new_size = (int(img.width * scale), int(img.height * scale))
                 img = img.resize(new_size, Image.Resampling.LANCZOS)
             
             # Save optimized original image
-            img.save(file_path, quality=94, optimize=True)
+            img.save(file_path, quality=92)
             width, height = img.size
             context_analysis = analyze_photo_context(img)
 
@@ -123,7 +123,7 @@ async def enhance_image(request: Request, payload: EnhanceRequest):
         with Image.open(orig_path) as img:
             intensity = payload.intensity if payload.intensity is not None else 0.85
             enhanced_img, report = enhance_photo(img, photographer, intensity=intensity)
-            enhanced_img.save(enhanced_path, quality=95, optimize=True)
+            enhanced_img.save(enhanced_path, quality=92)
 
         # Construct URLs
         base = str(request.base_url).rstrip("/")
